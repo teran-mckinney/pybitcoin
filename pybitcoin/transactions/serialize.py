@@ -55,9 +55,14 @@ def serialize_output(output):
     ])
 
 
-def serialize_transaction(inputs, outputs, lock_time=0, version=1):
+def serialize_transaction(inputs, outputs, lock_time=0, version=1, currency='BTC'):
     """ Serializes a transaction.
     """
+
+    hash_type = 1
+
+    if currency == 'BCH':
+        hash_type |= 0x40
 
     # add in the inputs
     serialized_inputs = ''.join([serialize_input(input) for input in inputs])
@@ -78,6 +83,8 @@ def serialize_transaction(inputs, outputs, lock_time=0, version=1):
         serialized_outputs,
         # add in the lock time
         hexlify(struct.pack('<I', lock_time)),
+        # add in the hash type last
+        hexlify(struct.pack('<I', hash_type)),
     ])
 
 

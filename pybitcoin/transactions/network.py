@@ -28,6 +28,11 @@ from ..services import (ChainComClient, BlockchainInfoClient, BitcoindClient,
     BlockcypherClient, BlockchainClient)
 from bitcoinrpc.authproxy import AuthServiceProxy
 
+SIGHASH_ALL = 1
+
+# For Bitcoin Cash
+SIGHASH_FORKID = 0x40
+
 
 def get_unspents(address, blockchain_client=BlockchainInfoClient()):
     """ Gets the unspent outputs for a given address.
@@ -86,7 +91,7 @@ def analyze_private_key(private_key, blockchain_client):
 
 def make_send_to_address_tx(recipient_address, amount, private_key,
         blockchain_client=BlockchainInfoClient(), fee=STANDARD_FEE,
-        change_address=None):
+        change_address=None, currency='BTC'):
     """ Builds and signs a "send to address" transaction.
     """
     # get out the private key object, sending address, and inputs
@@ -96,14 +101,25 @@ def make_send_to_address_tx(recipient_address, amount, private_key,
     if not change_address:
         change_address = from_address
     # create the outputs
-    outputs = make_pay_to_address_outputs(recipient_address, amount, inputs,
-                                          change_address, fee=fee)
+    outputs = make_pay_to_address_outputs(recipient_address,
+                                          amount,
+                                          inputs,
+                                          change_address,
+                                          fee)
     # serialize the transaction
-    unsigned_tx = serialize_transaction(inputs, outputs)
+    unsigned_tx = serialize_transaction(inputs, outputs, currency=currency)
+
+    # Set the sighash
+    sighash = SIGHASH_ALL
+    if currency == 'BCH':
+        sighash |= SIGHASH_FORKID
 
     # generate a scriptSig for each input
     for i in xrange(0, len(inputs)):
-        signed_tx = sign_transaction(unsigned_tx, i, private_key_obj.to_hex())
+        signed_tx = sign_transaction(unsigned_tx,
+                                     i,
+                                     private_key_obj.to_hex(),
+                                     sighash)
         unsigned_tx = signed_tx
 
     # return the signed tx
@@ -112,7 +128,7 @@ def make_send_to_address_tx(recipient_address, amount, private_key,
 
 def make_op_return_tx(data, private_key,
         blockchain_client=BlockchainInfoClient(), fee=OP_RETURN_FEE,
-        change_address=None, format='bin'):
+        change_address=None, format='bin', currency='BTC'):
     """ Builds and signs an OP_RETURN transaction.
     """
     # get out the private key object, sending address, and inputs
@@ -125,11 +141,19 @@ def make_op_return_tx(data, private_key,
     outputs = make_op_return_outputs(data, inputs, change_address,
         fee=fee, format=format)
     # serialize the transaction
-    unsigned_tx = serialize_transaction(inputs, outputs)
+    unsigned_tx = serialize_transaction(inputs, outputs, currency=currency)
+
+    # Set the sighash
+    sighash = SIGHASH_ALL
+    if currency == 'BCH':
+        sighash |= SIGHASH_FORKID
 
     # generate a scriptSig for each input
     for i in xrange(0, len(inputs)):
-        signed_tx = sign_transaction(unsigned_tx, i, private_key_obj.to_hex())
+        signed_tx = sign_transaction(unsigned_tx,
+                                     i,
+                                     private_key_obj.to_hex(),
+                                     sighash)
         unsigned_tx = signed_tx
 
     # return the signed tx
@@ -138,13 +162,13 @@ def make_op_return_tx(data, private_key,
 
 def send_to_address(recipient_address, amount, private_key,
         blockchain_client=BlockchainInfoClient(), fee=STANDARD_FEE,
-        change_address=None):
+        change_address=None, currency='BTC'):
     """ Builds, signs, and dispatches a "send to address" transaction.
     """
     # build and sign the tx
     signed_tx = make_send_to_address_tx(recipient_address, amount,
         private_key, blockchain_client, fee=fee,
-        change_address=change_address)
+        change_address=change_address, currency=currency)
     # dispatch the signed transction to the network
     response = broadcast_transaction(signed_tx, blockchain_client)
     # return the response
@@ -166,16 +190,25 @@ def embed_data_in_blockchain(data, private_key,
 
 
 def serialize_sign_and_broadcast(inputs, outputs, private_key,
-                                 blockchain_client=BlockchainInfoClient()):
+                                 blockchain_client=BlockchainInfoClient(),
+                                 currency='BTC'):
     # extract the private key object
     private_key_obj = get_private_key_obj(private_key)
 
     # serialize the transaction
-    unsigned_tx = serialize_transaction(inputs, outputs)
+    unsigned_tx = serialize_transaction(inputs, outputs, currency=currency)
+
+    # Set the sighash
+    sighash = SIGHASH_ALL
+    if currency == 'BCH':
+        sighash |= SIGHASH_FORKID
 
     # generate a scriptSig for each input
     for i in xrange(0, len(inputs)):
-        signed_tx = sign_transaction(unsigned_tx, i, private_key_obj.to_hex())
+        signed_tx = sign_transaction(unsigned_tx,
+                                     i,
+                                     private_key_obj.to_hex(),
+                                     sighash)
         unsigned_tx = signed_tx
 
     # dispatch the signed transaction to the network
@@ -184,7 +217,7 @@ def serialize_sign_and_broadcast(inputs, outputs, private_key,
     return response
 
 
-def sign_all_unsigned_inputs(hex_privkey, unsigned_tx_hex):
+def sign_all_unsigned_inputs(hex_privkey, unsigned_tx_hex, currency='BTC'):
     """
         Sign a serialized transaction's unsigned inputs
 
@@ -195,11 +228,20 @@ def sign_all_unsigned_inputs(hex_privkey, unsigned_tx_hex):
     """
     inputs, outputs, locktime, version = deserialize_transaction(unsigned_tx_hex)
     tx_hex = unsigned_tx_hex
+
+    # Set the sighash
+    sighash = SIGHASH_ALL
+    if currency == 'BCH':
+        sighash |= SIGHASH_FORKID
+
     for index in xrange(0, len(inputs)):
         if len(inputs[index]['script_sig']) == 0:
 
             # tx with index i signed with privkey
-            tx_hex = sign_transaction(str(unsigned_tx_hex), index, hex_privkey)
+            tx_hex = sign_transaction(str(unsigned_tx_hex),
+                                      index,
+                                      hex_privkey,
+                                      sighash)
             unsigned_tx_hex = tx_hex
 
     return tx_hex
