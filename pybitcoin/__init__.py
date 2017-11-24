@@ -32,7 +32,7 @@ from .formatcheck import (
 )
 from .wallet import SDWallet
 from .address import (
-    bin_hash160_to_address, hex_hash160_to_address, script_hex_to_address,
+    bin_hash160_to_address, hex_hash160_to_address, scriptPubKey_to_address,
     address_to_bin_hash160, address_to_hex_hash160,
     address_to_new_cryptocurrency
 )

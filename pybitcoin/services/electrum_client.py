@@ -28,14 +28,14 @@ class ElectrumClient():
             tx_hash = unspent['tx_hash']
             transaction = self.electrum.gettransaction(tx_hash)['hex']
             deserialized_tx = deserialize_transaction(transaction)
-            script_hex = deserialized_tx[1][0]['script_hex']
+            scriptPubKey = deserialized_tx[1][0]['scriptPubKey']
             # confirmations = blockchain_height - unspent['height']
             confirmations = 0
             # electrum's tx_hash is the big endian version already.
             formatted_unspent = {'transaction_hash': unspent['tx_hash'],
                                  'output_index': unspent['tx_pos'],
                                  'value': unspent['value'],
-                                 'script_hex': script_hex,
+                                 'scriptPubKey': scriptPubKey,
                                  'confirmations': confirmations}
             formatted_unspents.append(formatted_unspent)
         return formatted_unspents

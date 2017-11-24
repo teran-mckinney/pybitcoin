@@ -26,9 +26,9 @@ def make_pay_to_address_outputs(to_address, send_amount, inputs, change_address,
     """
     return [
         # main output
-        { "script_hex": make_pay_to_address_script(to_address), "value": send_amount },
+        { "scriptPubKey": make_pay_to_address_script(to_address), "value": send_amount },
         # change output
-        { "script_hex": make_pay_to_address_script(change_address),
+        { "scriptPubKey": make_pay_to_address_script(change_address),
           "value": calculate_change_amount(inputs, send_amount, fee)
         }
     ]
@@ -39,9 +39,9 @@ def make_op_return_outputs(data, inputs, change_address, fee=OP_RETURN_FEE,
     """
     return [
         # main output
-        { "script_hex": make_op_return_script(data, format=format), "value": send_amount },
+        { "scriptPubKey": make_op_return_script(data, format=format), "value": send_amount },
         # change output
-        { "script_hex": make_pay_to_address_script(change_address),
+        { "scriptPubKey": make_pay_to_address_script(change_address),
           "value": calculate_change_amount(inputs, send_amount, fee)
         }
     ]

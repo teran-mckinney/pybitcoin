@@ -13,7 +13,7 @@ from bitcoinrpc.authproxy import AuthServiceProxy
 
 from ..constants import SATOSHIS_PER_COIN
 
-from ..address import script_hex_to_address
+from ..address import scriptPubKey_to_address
 
 from .blockchain_client import BlockchainClient
 
@@ -43,7 +43,7 @@ def format_unspents(unspents):
         "transaction_hash": s["txid"],
         "output_index": s["vout"],
         "value": int(round(s["amount"]*SATOSHIS_PER_COIN)),
-        "script_hex": s["scriptPubKey"],
+        "scriptPubKey": s["scriptPubKey"],
         "confirmations": s["confirmations"]
         }
         for s in unspents

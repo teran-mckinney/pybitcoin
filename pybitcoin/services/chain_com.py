@@ -27,7 +27,7 @@ def format_unspents(unspents):
         "output_index": s["output_index"],
         "value": s["value"],
         "script_opcodes": s["script"],
-        "script_hex": s["script_hex"],
+        "scriptPubKey": s["scriptPubKey"],
         "script_type": s["script_type"],
         "confirmations": s["confirmations"]
         }

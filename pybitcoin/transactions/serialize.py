@@ -17,7 +17,7 @@ from ..constants import UINT_MAX
 from utilitybelt import is_hex
 
 
-def serialize_input(input, signature_script_hex=''):
+def serialize_input(input, signature_scriptPubKey=''):
     """ Serializes a transaction input.
     """
     if not (isinstance(input, dict) and 'transaction_hash' in input \
@@ -36,8 +36,8 @@ def serialize_input(input, signature_script_hex=''):
     return ''.join([
         flip_endian(input['transaction_hash']),
         hexlify(struct.pack('<I', input['output_index'])),
-        hexlify(variable_length_int(len(signature_script_hex)/2)),
-        signature_script_hex,
+        hexlify(variable_length_int(len(signature_scriptPubKey)/2)),
+        signature_scriptPubKey,
         hexlify(struct.pack('<I', input['sequence']))
     ])
 
@@ -45,13 +45,13 @@ def serialize_input(input, signature_script_hex=''):
 def serialize_output(output):
     """ Serializes a transaction output.
     """
-    if not ('value' in output and 'script_hex' in output):
+    if not ('value' in output and 'scriptPubKey' in output):
         raise Exception('Invalid output')
 
     return ''.join([
         hexlify(struct.pack('<Q', output['value'])), # pack into 8 bites
-        hexlify(variable_length_int(len(output['script_hex'])/2)),
-        output['script_hex']
+        hexlify(variable_length_int(len(output['scriptPubKey'])/2)),
+        output['scriptPubKey']
     ])
 
 
@@ -101,7 +101,7 @@ def deserialize_transaction(tx_hex):
 
         Each output will have:
         * value: int
-        * script_hex: string
+        * scriptPubKey: string
     """
 
     tx = bitcoin.deserialize(str(tx_hex))
@@ -129,7 +129,7 @@ def deserialize_transaction(tx_hex):
     for out in outputs:
         ret_out = {
             "value": out["value"],
-            "script_hex": out["script"]
+            "scriptPubKey": out["script"]
         }
 
         ret_outputs.append(ret_out)

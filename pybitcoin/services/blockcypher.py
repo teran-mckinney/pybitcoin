@@ -34,7 +34,7 @@ def format_unspents(unspents):
         "transaction_hash": s["tx_hash"],
         "output_index": s["tx_output_n"],
         "value": s["value"],
-        "script_hex": s.get("script"),
+        "scriptPubKey": s.get("script"),
         "confirmations": s["confirmations"],
         }
         for s in all_unspents

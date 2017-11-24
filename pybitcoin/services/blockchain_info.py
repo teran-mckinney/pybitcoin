@@ -27,7 +27,7 @@ def format_unspents(unspents):
         "transaction_hash": reverse_hash(s["tx_hash"]),
         "output_index": s["tx_output_n"],
         "value": s["value"],
-        "script_hex": s["script"],
+        "scriptPubKey": s["script"],
         "confirmations": s["confirmations"]
         }
         for s in unspents

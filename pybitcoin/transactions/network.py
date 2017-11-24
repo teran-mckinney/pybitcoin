@@ -76,7 +76,7 @@ def get_private_key_obj(private_key):
     if isinstance(private_key, BitcoinPrivateKey):
         return private_key
     else:
-        return BitcoinPrivateKey(private_key)
+        return BitcoinPrivateKey(private_key, compressed=True)
 
 
 def analyze_private_key(private_key, blockchain_client):
@@ -119,7 +119,8 @@ def make_send_to_address_tx(recipient_address, amount, private_key,
         signed_tx = sign_transaction(unsigned_tx,
                                      i,
                                      private_key_obj.to_hex(),
-                                     sighash)
+                                     sighash,
+                                     inputs)
         unsigned_tx = signed_tx
 
     # return the signed tx
@@ -153,7 +154,8 @@ def make_op_return_tx(data, private_key,
         signed_tx = sign_transaction(unsigned_tx,
                                      i,
                                      private_key_obj.to_hex(),
-                                     sighash)
+                                     sighash,
+                                     inputs)
         unsigned_tx = signed_tx
 
     # return the signed tx
@@ -208,7 +210,8 @@ def serialize_sign_and_broadcast(inputs, outputs, private_key,
         signed_tx = sign_transaction(unsigned_tx,
                                      i,
                                      private_key_obj.to_hex(),
-                                     sighash)
+                                     sighash,
+                                     inputs)
         unsigned_tx = signed_tx
 
     # dispatch the signed transaction to the network
@@ -241,7 +244,8 @@ def sign_all_unsigned_inputs(hex_privkey, unsigned_tx_hex, currency='BTC'):
             tx_hex = sign_transaction(str(unsigned_tx_hex),
                                       index,
                                       hex_privkey,
-                                      sighash)
+                                      sighash,
+                                      inputs)
             unsigned_tx_hex = tx_hex
 
     return tx_hex

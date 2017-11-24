@@ -406,7 +406,7 @@ class SequentialWalletTest(unittest.TestCase):
 
 UNSPENTS_DICT = {
     '691d1645dc6f9431fe2ef414aaa88887efb5fed9354bf53ed01349595bf725ed': {
-        'script_hex': '76a9148eac3d867e1f92f47da40217c3cbd3d75d05701388ac',
+        'scriptPubKey': '76a9148eac3d867e1f92f47da40217c3cbd3d75d05701388ac',
         'output_index': 1,
         'transaction_hash': ("691d1645dc6f9431fe2ef414aaa88887efb5fed9354bf"
                              "53ed01349595bf725ed"),
@@ -435,7 +435,7 @@ class ServicesGetUnspentsTest(unittest.TestCase):
                 self.assertEqual(
                     unspent['output_index'], ref_unspent['output_index'])
                 self.assertEqual(
-                    unspent['script_hex'], ref_unspent['script_hex'])
+                    unspent['scriptPubKey'], ref_unspent['scriptPubKey'])
                 self.assertEqual(unspent['value'], ref_unspent['value'])
             else:
                 continue

@@ -25,8 +25,11 @@ setup(
         'utilitybelt>=0.2.6',
         'python-bitcoinrpc==0.1',
         'keychain>=0.1.4',
-        'bitcoin>=1.1.42',
+        'bitcoin>=1.1.43',
         'jsonrpclib-pelix'
+    ],
+    dependency_links = [
+        'https://github.com/teran-mckinney/pybitcointools/tarball/master#egg=bitcoin-1.1.43'
     ],
     classifiers=[
         'Intended Audience :: Developers',
